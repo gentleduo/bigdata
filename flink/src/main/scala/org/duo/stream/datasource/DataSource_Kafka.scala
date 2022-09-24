@@ -23,8 +23,12 @@ object DataSource_Kafka {
     props.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaCluster)
     val flinkKafkaConsumer = new FlinkKafkaConsumer011[String](kafkaTopic, new SimpleStringSchema(), props)
 
-    //4 .设置数据源
-    val kafkaDataStream: DataStream[String] = env.addSource(flinkKafkaConsumer)
+    //4 .设置数据源 实现wordcount
+    val kafkaDataStream: DataStream[(String, Int)] = env.addSource(flinkKafkaConsumer)
+      .flatMap(_.split("\\s")).
+      map((_, 1)).
+      keyBy(_._1).
+      sum(1)
 
     // 5. 打印数据
     kafkaDataStream.print()

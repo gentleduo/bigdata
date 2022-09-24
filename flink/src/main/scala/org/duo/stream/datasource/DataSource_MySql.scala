@@ -28,11 +28,9 @@ object DataSource_MySql {
         val username = resultSet.getString("username")
         val password = resultSet.getString("password")
         val name = resultSet.getString("nickname")
-
         // 收集数据
         ctx.collect((id, username, password, name))
       }
-
     }
 
     override def cancel(): Unit = {
@@ -41,6 +39,7 @@ object DataSource_MySql {
   }
 
   def main(args: Array[String]): Unit = {
+
     // 1. env
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 
@@ -53,6 +52,4 @@ object DataSource_MySql {
     // 4. 执行任务
     env.execute()
   }
-
-
 }

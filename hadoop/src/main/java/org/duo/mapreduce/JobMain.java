@@ -30,7 +30,6 @@ public class JobMain extends Configured implements Tool {
         job.setInputFormatClass(TextInputFormat.class);
         TextInputFormat.addInputPath(job, new Path("hdfs://server01:8020/wordcount"));
         //TextInputFormat.addInputPath(job, new Path("file:///D:\\mapreduce\\input"));
-
         //第二步:指定Map阶段的处理方式和数据类型
         job.setMapperClass(WordCountMapper.class);
         //设置Map阶段K2的类型

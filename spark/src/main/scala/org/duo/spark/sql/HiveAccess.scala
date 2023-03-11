@@ -11,14 +11,20 @@ object HiveAccess {
     //    2. 指定 Metastore 的位置
     //    3. 指定 Warehouse 的位置
     val spark = SparkSession.builder()
+      .master("local[*]")
       .appName("hive access1")
-      .enableHiveSupport()
       .config("hive.metastore.uris", "thrift://server01:9083")
       // 创建student表时，指定了/location
-      .config("spark.sql.warehouse.dir", "/data/hive/student")
+      .config("spark.sql.warehouse.dir", "hdfs://server01:8020/data/hive")
+      .enableHiveSupport()
       .getOrCreate()
 
     import spark.implicits._
+
+
+    //    spark.sql("create database sparkHiveDb").show();
+    spark.sql("show databases").show();
+    spark.sql("use sparkHiveDb").show
 
     // 2. 读取数据
     //    1. 上传 HDFS, 因为要在集群中执行, 没办法保证程序在哪个机器中执行
@@ -27,24 +33,28 @@ object HiveAccess {
     //        它是一个外部系统
     //    2. 使用 DF 读取数据
 
-    val schema = StructType(
-      List(
-        StructField("id", StringType),
-        StructField("name", StringType),
-        StructField("birthday", StringType),
-        StructField("gender", StringType)
-      )
-    )
+    //    val schema = StructType(
+    //      List(
+    //        StructField("id", StringType),
+    //        StructField("name", StringType),
+    //        StructField("birthday", StringType),
+    //        StructField("gender", StringType)
+    //      )
+    //    )
+    //
+    //    val dataframe: DataFrame = spark.read
+    //      .option("delimiter", "\t")
+    //      .schema(schema)
+    //      .csv("hdfs://server01:8020/data/student")
+    //
+    //
+    //    //val resultDF: Dataset[Row] = dataframe.where('age > 50)
+    //
+    //    // 3. 写入数据, 使用写入表的 API, saveAsTable
+    //    dataframe.write.mode(SaveMode.Overwrite).saveAsTable("student")
 
-    val dataframe: DataFrame = spark.read
-      .option("delimiter", "\t")
-      .schema(schema)
-      .csv("hdfs:///data/student")
-
-
-    //val resultDF: Dataset[Row] = dataframe.where('age > 50)
-
-    // 3. 写入数据, 使用写入表的 API, saveAsTable
-    dataframe.write.mode(SaveMode.Overwrite).saveAsTable("myhive.student")
+    //    // 读取数据
+    spark.sql("select * from student").show();
+    spark.close();
   }
 }

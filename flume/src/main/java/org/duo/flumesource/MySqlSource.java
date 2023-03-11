@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * 修改代码注释的颜色
+ */
 public class MySqlSource extends AbstractSource implements Configurable, PollableSource {
 
     //打印日志
     private static final Logger LOG = getLogger(MySqlSource.class);
     //定义sqlHelper
     private QueryMySql sqlSourceHelper;
-
 
     @Override
     public long getBackOffSleepIncrement() {
@@ -42,7 +43,9 @@ public class MySqlSource extends AbstractSource implements Configurable, Pollabl
 
     @Override
     public Status process() throws EventDeliveryException {
+
         try {
+
             //查询数据表
             List<List<Object>> result = sqlSourceHelper.executeQuery();
             //存放event的集合
@@ -79,6 +82,7 @@ public class MySqlSource extends AbstractSource implements Configurable, Pollabl
         try {
             //关闭资源
             sqlSourceHelper.close();
+
         } finally {
             super.stop();
         }

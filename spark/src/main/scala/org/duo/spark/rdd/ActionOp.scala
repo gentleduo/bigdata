@@ -1,5 +1,6 @@
 package org.duo.spark.rdd
 
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.Test
 
@@ -50,6 +51,7 @@ class ActionOp {
   @Test
   def take(): Unit = {
     val rdd = sc.parallelize(Seq(1, 2, 3, 4, 5, 6))
+    rdd.persist(StorageLevel.DISK_ONLY);
     rdd.take(3).foreach(item => println(item))
     println(rdd.first())
     rdd.takeSample(withReplacement = false, num = 3).foreach(item => println(item))

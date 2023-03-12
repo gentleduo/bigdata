@@ -19,6 +19,12 @@ object sparkSql_Basic {
     val context = session.sparkContext
     context.setLogLevel("ERROR")
 
+    // Catalog
+    // 在关系数据库中，Catalog是一个宽泛的概念，通常可以理解为一个容器或数据库对象命名空间中的一个层。
+    // 在SparkSQL系统中，Catalog主要用于各种函数资源信息和元数据信息（数据库、数据表、数据视图、数据分区与函数等）的统一管理。
+    // SparkSession默认按照in-memory的方式创建Catalog，但是如果调用SparkSession.enableHiveSupport()，会将其改为“hive”
+    // 由于InMemoryCatalog会将元数据全部储存在内存之中，使用一个HashMap类型，储存数据库元信息。所以此时调用DDL语句会报错
+    // session.sql("create table t_emp(name string, age int)")
     val databases: Dataset[Database] = session.catalog.listDatabases();
     databases.show()
     val tables: Dataset[Table] = session.catalog.listTables()

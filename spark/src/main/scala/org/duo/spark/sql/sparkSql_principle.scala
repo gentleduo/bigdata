@@ -2,7 +2,7 @@ package org.duo.spark.sql
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Encoders, Row, SparkSession}
 
 
 /**
@@ -30,7 +30,7 @@ object sparkSql_principle {
 
 
     // 2 元数据：StructType
-    val fields = Array (
+    val fields = Array(
       StructField.apply("name", DataTypes.StringType, true),
       StructField.apply("age", DataTypes.IntegerType, true)
     )
@@ -41,6 +41,17 @@ object sparkSql_principle {
     dataframe.printSchema();
     dataframe.createTempView("person")
     session.sql("select * from person").show()
+
+    //import session.implicits._
+
+    val ds01: Dataset[String] = session.read.textFile("./spark/data/person.txt")
+    val person: Dataset[(String, Int)] = ds01.map(line => {
+      val strs: Array[String] = line.split(" ")
+      (strs(0), strs(1).toInt)
+    })(Encoders.tuple(Encoders.STRING, Encoders.scalaInt))
+    val frame: DataFrame = person.toDF("name", "age")
+    frame.show()
+    frame.printSchema()
   }
 
 

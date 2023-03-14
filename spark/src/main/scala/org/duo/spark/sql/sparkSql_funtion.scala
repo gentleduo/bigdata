@@ -76,7 +76,7 @@ object sparkSql_funtion {
 
     import session.implicits._
 
-    val dataFrame: DataFrame = List(("A", 1, 90), ("A", 2, 70), ("B", 1, 68), ("B", 2, 89), ("C", 1, 61), ("C", 2, 90)).toDF("name", "class", "score")
+    val dataFrame: DataFrame = List(("A", 1, 90), ("A", 2, 70), ("B", 1, 68), ("B", 2, 89), ("C", 1, 61), ("C", 2, 90), ("D", 1, 56), ("D", 2, 67)).toDF("name", "class", "score")
 
     dataFrame.createTempView("users")
 
@@ -90,5 +90,23 @@ object sparkSql_funtion {
     session.udf.register("customAgg", new myAggFunc)
 
     session.sql("select name,customAgg(score) from users group by name").show()
+
+    // 开窗函数：依赖 fun() over(partition order)
+    // group by 是纯聚合函数：一组就最后一条
+    // rank和row_number都是排名，但是rank相同的数据会出现相同的排名
+    session.sql("select *, rank() over(partition by class order by score desc) as rank," +
+      "row_number() over(partition by class order by score desc) as row_number from users").show()
+
+    session.sql("select *,count(score) over(partition by class) as num from users").show()
+
+    val res:DataFrame = session.sql("select ta.name,ta.class,tb.score " +
+      "from " +
+      "(select name,class from users) as ta " +
+      "join " +
+      "(select name,score from users) as tb " +
+      "on ta.name = tb.name " +
+      "where tb.score > 60 ")
+    res.show()
+    res.explain(true)
   }
 }

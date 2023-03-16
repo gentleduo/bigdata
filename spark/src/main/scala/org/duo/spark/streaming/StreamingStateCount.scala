@@ -3,7 +3,7 @@ package org.duo.spark.streaming
 import org.apache.spark.SparkConf
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.dstream.DStream
-import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.streaming.{Seconds, State, StateSpec, StreamingContext}
 
 /**
  * @Auther:duo
@@ -34,12 +34,18 @@ object StreamingStateCount {
     // 历史的计算结果都要保存下来，当前的计算最后还要合到历史数据里
     // 持久化下来历史的数据状态
     val mapdata: DStream[(String, Int)] = lines.map(_.split(" ")).map(x => (x(0), x(1).toInt))
-    val res = mapdata.updateStateByKey(
-      (nv: Seq[Int], ov: Option[Int]) => {
-        val count: Int = nv.count(_ > 0)
-        val oldVal: Int = ov.getOrElse(0)
-        Some(count + oldVal)
-      })
+    //    val res = mapdata.updateStateByKey(
+    //      (nv: Seq[Int], ov: Option[Int]) => {
+    //        val count: Int = nv.count(_ > 0)
+    //        val oldVal: Int = ov.getOrElse(0)
+    //        Some(count + oldVal)
+    //      })
+
+    val res = mapdata.mapWithState(StateSpec.function(
+      (k: String, nv: Option[Int], ov: State[Int]) => {
+        (k, nv.getOrElse(0) + ov.getOption().getOrElse(0))
+      }
+    ))
 
     res.print()
 

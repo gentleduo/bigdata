@@ -9,14 +9,14 @@ object WordCount {
   def main(args: Array[String]): Unit = {
 
     // 1. 创建SparkContext
-    val conf = new SparkConf().setMaster("local[6]").setAppName("spark_context") //本地运行
-    //val conf = new SparkConf().setAppName("word_count") // 集群运行
+    //val conf = new SparkConf().setMaster("local[6]").setAppName("spark_context") //本地运行
+    val conf = new SparkConf().setAppName("word_count") // 集群运行
     val sc = new SparkContext(conf)
 
     // 2. 加载文件
     //val rdd1: RDD[String] = sc.textFile("D:\\intellij-workspace\\bigdata\\spark\\data\\wordcount.txt")
-    val rdd1: RDD[String] = sc.textFile("hdfs://server01:8020/data/input/wordcount.txt")
-    //val rdd1: RDD[String] = sc.textFile(args(0))
+    //val rdd1: RDD[String] = sc.textFile("hdfs://server01:8020/data/input/wordcount.txt")
+    val rdd1: RDD[String] = sc.textFile(args(0))
 
     // 3. 处理
     //     1. 把整句话拆分为多个单词
@@ -27,10 +27,10 @@ object WordCount {
     val rdd4: RDD[(String, Int)] = rdd3.reduceByKey((curr, agg) => curr + agg)
 
     // 4. 得到结果
-    println(rdd4.toDebugString)
+    //println(rdd4.toDebugString)
     //    val result: Array[(String, Int)] = rdd4.collect()
     //    result.foreach(item => println(item))
-    //rdd4.saveAsTextFile(args(1))
+    rdd4.saveAsTextFile(args(1))
 
     val rddA = sc.parallelize(Seq(1, 2, 3))
     val rddB = sc.parallelize(Seq("a", "b"))

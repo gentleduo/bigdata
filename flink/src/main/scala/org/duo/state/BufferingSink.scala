@@ -67,9 +67,9 @@ class BufferingSink(threshold: Int = 0)
 
     // 如果是错误恢复状态, 获取ListState对象的值,并且累加到bufferedElements
     if(context.isRestored) {
-      for(element <- checkpointedState.get()) {
-        bufferedElements += element
-      }
+//      for(element <- checkpointedState.get()) {
+//        bufferedElements += element
+//      }
     }
   }
 
